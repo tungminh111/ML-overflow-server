@@ -19,6 +19,8 @@
   "homepage": "https://github.com/tungminh111/ML-overflow-server#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "graphql-tools": "^8.2.0",
     "nodemon": "^2.0.12"
   }
 }
