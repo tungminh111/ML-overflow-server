@@ -1,20 +1,18 @@
 const express = require("express");
 const app = express();
 const { PORT } = require("./config");
-//const { initDatabase } = require("./config/database");
-//const User = require("./models/user.model");
+const { initDatabase } = require("./config/database");
+const service = require("./services");
 
-//initDatabase();
+initDatabase();
 
 // define a route handler for the default home page
 app.get("/", async (req, res) => {
-    //const newUser = User.build({
-        //firstName: "Longdz",
-    //});
-    //await newUser.save();
-    //const users = await User.findAll();
-    //res.json(users);
-    res.send("MINH");
+    await service.User.create({
+        firstName: "Longdz",
+    });
+    const users = await service.User.findAll();
+    res.json(users);
 });
 
 // start the Express server
