@@ -13,7 +13,7 @@ app.get("/", async (req, res) => {
     });
     await newUser.save();
     const users = await User.findAll();
-    res.send(JSON.stringify(users));
+    res.json(users);
 });
 
 // start the Express server
