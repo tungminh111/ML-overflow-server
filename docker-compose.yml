@@ -1,9 +1,19 @@
 version: "2"
 
 services:
+  postgres: 
+    container_name: postgres_container
+    image: postgres
+    environment: 
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      PGDATA: /data
+    restart: unless-stopped 
   backend:
+    container_name: backend_container
     build:
       context: ./
-    ports:
-      - "8080:8080" 
     restart: always
+    network_mode: service:postgres
+    depends_on:
+      - "postgres"

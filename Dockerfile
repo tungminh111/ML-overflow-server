@@ -7,4 +7,5 @@ COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install --production
 COPY . .
 EXPOSE 8080
+CMD ["psql", "createdb mloverflow"]
 CMD [ "node", "src/index.js" ]
