@@ -25,6 +25,16 @@ services:
     restart: always
     networks: 
       - postgres
+    ports:
+      - 8080:8080
+      
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+
+      - /app/node_modules
+      
     depends_on:
       postgres: 
         condition: service_healthy
