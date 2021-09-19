@@ -1,4 +1,4 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = {
@@ -8,4 +8,4 @@ module.exports = {
     PGPASSWORD: process.env.PGPASSWORD,
     PGDATABASE: process.env.PGDATABASE,
     PGPORT: process.env.PGPORT,
-}
+};

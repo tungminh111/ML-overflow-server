@@ -15,9 +15,6 @@ const User = sequelize.define(
             type: DataTypes.STRING,
         },
     },
-    {
-        // tableName: 'user'
-    }
 );
 
 module.exports = User;

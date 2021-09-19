@@ -10,6 +10,10 @@ const create = async (data) => {
 };
 
 module.exports = {
-    findAll: User.findAll,
+    findAll: async (...params) => {
+        const users = await User.findAll(...params);
+        return users
+
+    },
     create,
 };
