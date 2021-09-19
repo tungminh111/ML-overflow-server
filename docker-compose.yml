@@ -6,14 +6,29 @@ services:
     image: postgres
     environment: 
       POSTGRES_USER: ${PGUSER}
+      POSTGRES_DB: ${PGDATABASE}
       POSTGRES_PASSWORD: ${PGPASSWORD}
-      PGDATA: /data
     restart: unless-stopped 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    networks: 
+      - postgres
   backend:
     container_name: backend_container
     build:
       context: ./
     restart: always
-    network_mode: service:postgres
+    networks: 
+      - postgres
     depends_on:
-      - "postgres"
+      postgres: 
+        condition: service_healthy
+
+networks:
+  postgres:
+    driver: bridge
