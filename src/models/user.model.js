@@ -1,8 +1,11 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database");
 
+// How to define a model? I knewn you would ask this, hahaha! 
+// Follow instruction here: https://sequelize.org/master/manual/model-basics.html
+
 const User = sequelize.define(
-    "User",
+    "User", // Model name
     {
         firstName: {
             type: DataTypes.STRING,
@@ -12,7 +15,6 @@ const User = sequelize.define(
             type: DataTypes.STRING,
         },
     },
-    {}
 );
 
 module.exports = User;
