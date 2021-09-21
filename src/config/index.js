@@ -8,4 +8,6 @@ module.exports = {
     PGPASSWORD: process.env.PGPASSWORD,
     PGDATABASE: process.env.PGDATABASE,
     PGPORT: process.env.PGPORT,
+    PRIVATE_KEY: process.env.PRIVATE_KEY,
+    REDIS_HOST: process.env.REDIS_HOST,
 };

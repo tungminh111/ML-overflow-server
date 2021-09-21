@@ -10,10 +10,13 @@ const create = async (data) => {
 };
 
 module.exports = {
+    findOne: async (...params) => {
+        const user = await User.findOne(...params);
+        return user;
+    },
     findAll: async (...params) => {
         const users = await User.findAll(...params);
-        return users
-
+        return users;
     },
     create,
 };

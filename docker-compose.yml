@@ -1,6 +1,13 @@
 version: "2"
 
 services:
+  redis:
+    container_name: redis_container
+    image: redis:alpine
+    networks: 
+      - mynetwork
+    ports:
+      - 6379:6379
   postgres: 
     container_name: postgres_container
     image: postgres
@@ -17,14 +24,14 @@ services:
     ports:
       - 5432:5432
     networks: 
-      - postgres
+      - mynetwork
   backend:
     container_name: backend_container
     build:
       context: ./
     restart: always
     networks: 
-      - postgres
+      - mynetwork
     ports:
       - 8080:8080
       
@@ -40,5 +47,5 @@ services:
         condition: service_healthy
 
 networks:
-  postgres:
+  mynetwork:
     driver: bridge
