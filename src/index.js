@@ -13,7 +13,7 @@ startApolloServer(app);
 app.get("/", async (req, res) => {
     res.send(
         `<h1 style="text-align: center; margin-top:100px;">
-            Nothing here! You can explore graphql servers <a href="http://localhost:${config.PORT}/graphql">here</a>
+            Nothing here! You can explore graphql servers ! <a href="http://localhost:${config.PORT}/graphql">here</a>
         </h1>`
     );
 });
