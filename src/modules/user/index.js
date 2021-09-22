@@ -22,7 +22,7 @@ const userModule = createModule({
             }
 
             extend type Query {
-                users: [User]!
+                users: [User]
             }
         `,
     ],
