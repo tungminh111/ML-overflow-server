@@ -5,6 +5,10 @@ const commonModule = createModule({
     dirname: __dirname,
     typeDefs: [
         gql`
+            type Query {
+                helloWorld: String
+            }
+
             type Response {
                 data: String
                 message: String
@@ -12,7 +16,11 @@ const commonModule = createModule({
             }
         `,
     ],
-    resolvers: {},
+    resolvers: {
+        Query: {
+            helloWorld: () => "Hello world!",
+        },
+    },
 });
 
 module.exports = {

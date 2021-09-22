@@ -4,6 +4,8 @@ const CryptoJS = require("crypto-js");
 const config = require("../../config");
 const { Op } = require("sequelize");
 const { redisClient } = require("../../config/redis");
+const jwt = require("jsonwebtoken");
+const { AuthenticationError } = require("apollo-server-errors");
 
 const userModule = createModule({
     id: "user",
@@ -18,7 +20,7 @@ const userModule = createModule({
                 avatar: String
             }
 
-            type Query {
+            extend type Query {
                 users: [User]!
             }
 
@@ -33,13 +35,19 @@ const userModule = createModule({
 
                 login(username: String!, password: String!): Response
 
-                validateToken(token: String!): Response
+                verifyToken(token: String!): Response
             }
         `,
     ],
     resolvers: {
         Query: {
-            users: () => service.User.findAll(),
+            users: (parent, args, context, info) => {
+                const { isAuthenticated, userId, authenticatedErrorMsg } =
+                    context;
+                if (!isAuthenticated)
+                    throw new AuthenticationError(authenticatedErrorMsg);
+                return service.User.findAll();
+            },
         },
         Mutation: {
             createUser: async (parent, args, context, info) => {
@@ -71,8 +79,20 @@ const userModule = createModule({
                 const isSuccess = trueEncryptedPassword === encryptedPassword;
                 let token = null;
                 if (isSuccess) {
-                    token = userDataValue.username + "'s token";
-                    redisClient.set(token, JSON.stringify(userDataValue));
+                    // Generate token
+                    token = jwt.sign(
+                        {
+                            sub: userDataValue.id,
+                            username: userDataValue.username,
+                        },
+                        config.JWT_SECRET,
+                        {
+                            expiresIn: config.JWT_ACCESS_TIME,
+                        }
+                    );
+
+                    // Save to Redis
+                    // redisClient.set(token, JSON.stringify(userDataValue));
                 }
 
                 return {
@@ -84,17 +104,21 @@ const userModule = createModule({
                     success: isSuccess,
                 };
             },
-            validateToken: async (parent, args, context, info) => {
-                const dataRedis = await redisClient.get(args.token);
-                const isLoggedIn = dataRedis !== null;
-                const dataResponse = {
-                    isLoggedIn,
-                    user: JSON.parse(dataRedis),
-                };
-                return {
-                    data: JSON.stringify(dataResponse),
-                    success: true,
-                };
+            verifyToken: async (parent, args, context, info) => {
+                try {
+                    const decoded = jwt.verify(args.token, config.JWT_SECRET);
+
+                    return {
+                        data: JSON.stringify(decoded),
+                        success: true,
+                    };
+                } catch (e) {
+                    return {
+                        data: null,
+                        message: e.toString(),
+                        success: false,
+                    };
+                }
             },
         },
     },

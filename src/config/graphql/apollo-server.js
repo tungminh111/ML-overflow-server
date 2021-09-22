@@ -6,6 +6,7 @@ const {
 const http = require("http");
 const { schema } = require("./graphql-module");
 const config = require("..");
+const jwt = require("jsonwebtoken");
 
 async function startApolloServer(app) {
     const httpServer = http.createServer(app);
@@ -16,6 +17,28 @@ async function startApolloServer(app) {
             ApolloServerPluginDrainHttpServer({ httpServer }),
             ApolloServerPluginLandingPageGraphQLPlayground(),
         ],
+        context: ({ req }) => {
+            const authorization = req.headers.authorization;
+            try {
+                const decoded = jwt.verify(
+                    authorization ? authorization.split(" ")[1] : null,
+                    config.JWT_SECRET
+                );
+                return {
+                    isAuthenticated: true,
+                    authenticatedErrorMsg: null,
+                    userId: decoded.sub,
+                    username: decoded.username,
+                };
+            } catch (e) {
+                return {
+                    isAuthenticated: false,
+                    authenticatedErrorMsg: e.toString(),
+                    userId: null,
+                    username: null,
+                };
+            }
+        },
     });
     await server.start();
     server.applyMiddleware({ app });
