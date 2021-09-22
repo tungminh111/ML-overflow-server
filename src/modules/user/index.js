@@ -6,6 +6,7 @@ const { Op } = require("sequelize");
 const { redisClient } = require("../../config/redis");
 const jwt = require("jsonwebtoken");
 const { AuthenticationError } = require("apollo-server-errors");
+const Helpers = require("../../helpers");
 
 const userModule = createModule({
     id: "user",
@@ -35,7 +36,11 @@ const userModule = createModule({
 
                 login(username: String!, password: String!): Response
 
-                verifyToken(token: String!): Response
+                verifyRefreshToken(refreshToken: String!): Response
+
+                generateAccessToken(refreshToken: String!): Response
+
+                logout(refreshToken: String!): Response
             }
         `,
     ],
@@ -77,41 +82,109 @@ const userModule = createModule({
                     config.PRIVATE_KEY
                 ).toString();
                 const isSuccess = trueEncryptedPassword === encryptedPassword;
-                let token = null;
+                let accessToken = null;
                 if (isSuccess) {
                     // Generate token
-                    token = jwt.sign(
+                    accessToken = Helpers.generateAccessToken(
+                        userDataValue.id,
+                        userDataValue.username
+                    );
+                    refreshToken = jwt.sign(
                         {
                             sub: userDataValue.id,
                             username: userDataValue.username,
                         },
-                        config.JWT_SECRET,
+                        config.JWT_REFRESH_SECRET,
                         {
-                            expiresIn: config.JWT_ACCESS_TIME,
+                            expiresIn: config.JWT_REFRESH_TIME,
                         }
                     );
 
-                    // Save to Redis
-                    // redisClient.set(token, JSON.stringify(userDataValue));
+                    redisClient.set(refreshToken, userDataValue.id);
                 }
 
                 return {
                     data: isSuccess
                         ? JSON.stringify({
-                              token: token,
+                              accessToken: accessToken,
+                              refreshToken: refreshToken,
                           })
                         : null,
                     success: isSuccess,
                 };
             },
-            verifyToken: async (parent, args, context, info) => {
-                try {
-                    const decoded = jwt.verify(args.token, config.JWT_SECRET);
+            logout: async (parent, args, context, info) => {
+                const {
+                    isAuthenticated,
+                    userId,
+                    authenticatedErrorMsg,
+                    accessToken,
+                } = context;
+                if (isAuthenticated && userId) {
+                    // delete token in redis
+                    await redisClient.del(args.refreshToken);
 
+                    // set current access token to black list and expire after config.JWT_ACCESS_TIME seconds
+                    await redisClient.set("BL_" + accessToken, userId, {
+                        EX: config.JWT_ACCESS_TIME,
+                    });
                     return {
-                        data: JSON.stringify(decoded),
+                        data: null,
+                        message: "Logout success",
                         success: true,
                     };
+                } else throw new AuthenticationError(authenticatedErrorMsg);
+            },
+            verifyRefreshToken: async (parent, args, context, info) => {
+                try {
+                    const decoded = jwt.verify(
+                        args.refreshToken,
+                        config.JWT_REFRESH_SECRET
+                    );
+
+                    if (!decoded) throw new Error("Token invalid");
+
+                    // check refresh token if it is stored in redis
+                    const storedUserToken = await redisClient.get(
+                        args.refreshToken
+                    );
+                    if (storedUserToken === decoded.sub)
+                        return {
+                            data: JSON.stringify(decoded),
+                            success: true,
+                        };
+                    else throw new Error("Token invalid");
+                } catch (e) {
+                    return {
+                        data: null,
+                        message: e.toString(),
+                        success: false,
+                    };
+                }
+            },
+            generateAccessToken: async (parent, args, context, info) => {
+                try {
+                    const decoded = jwt.verify(
+                        args.refreshToken,
+                        config.JWT_REFRESH_SECRET
+                    );
+
+                    if (!decoded) throw new Error("Refresh token invalid");
+
+                    // check refresh token if it is stored in redis
+                    const storedUserToken = await redisClient.get(
+                        args.refreshToken
+                    );
+                    if (storedUserToken === decoded.sub) {
+                        const accessToken = Helpers.generateAccessToken(
+                            decoded.sub,
+                            decoded.username
+                        );
+                        return {
+                            data: accessToken,
+                            success: true,
+                        };
+                    } else throw new Error("Refresh token invalid");
                 } catch (e) {
                     return {
                         data: null,
