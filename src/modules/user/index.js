@@ -7,6 +7,7 @@ const { redisClient } = require("../../config/redis");
 const jwt = require("jsonwebtoken");
 const { AuthenticationError } = require("apollo-server-errors");
 const Helpers = require("../../helpers");
+const controller = require("../../controller");
 
 const userModule = createModule({
     id: "user",
@@ -36,31 +37,10 @@ const userModule = createModule({
     ],
     resolvers: {
         Query: {
-            users: (parent, args, context, info) => {
-                const { isAuthenticated, userId, authenticatedErrorMsg } =
-                    context;
-                if (!isAuthenticated)
-                    throw new AuthenticationError(authenticatedErrorMsg);
-                return service.User.findAll();
-            },
+            users: controller.user.getUsers,
         },
         Mutation: {
-            updateInformationUser: async (parent, args, context, info) => {
-                const { isAuthenticated, userId, authenticatedErrorMsg } =
-                    context;
-                if (!isAuthenticated || userId !== args.userId)
-                    throw new AuthenticationError(authenticatedErrorMsg);
-
-                const result = await service.User.update({
-                    userId,
-                    name: args.name,
-                    avatar: args.avatar,
-                });
-                return {
-                    message: "Success",
-                    success: true,
-                };
-            },
+            updateInformationUser: controller.user.updateInformationUser,
         },
     },
 });
