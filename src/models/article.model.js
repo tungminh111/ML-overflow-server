@@ -26,7 +26,6 @@ const Article = sequelize.define(
         },
         slug: {
             type: DataTypes.STRING,
-            unique: true
         },
         thumbnailImage: {
             type: DataTypes.STRING

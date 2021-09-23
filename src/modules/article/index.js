@@ -28,7 +28,7 @@ const articleModule = createModule({
                     title: String!
                     content: String!
                     createDate: String!
-                    authorUsername: String!
+                    authorUsername: String
                     thumbnailImage: String
                 ): Response
             }
@@ -51,7 +51,7 @@ const articleModule = createModule({
                     title: args.title,
                     content: args.content,
                     createDate: Date.parse(args.createDate),
-                    authorId: 1, // fixme: authentication
+                    authorUsername: args.authorUsername, // fixme: authentication
                     thumbnailImage: args.thumbnailImage 
                 }
                 controller.article.createArticle(data);
