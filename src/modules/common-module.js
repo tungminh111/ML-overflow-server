@@ -9,6 +9,10 @@ const commonModule = createModule({
                 helloWorld: String
             }
 
+            type Mutation {
+                helloWorld: String
+            }
+
             type Response {
                 data: String
                 message: String
@@ -18,6 +22,9 @@ const commonModule = createModule({
     ],
     resolvers: {
         Query: {
+            helloWorld: () => "Hello world!",
+        },
+        Mutation: {
             helloWorld: () => "Hello world!",
         },
     },

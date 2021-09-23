@@ -7,6 +7,7 @@ const http = require("http");
 const { schema } = require("./graphql-module");
 const config = require("..");
 const jwt = require("jsonwebtoken");
+const { redisClient } = require("../redis");
 
 async function startApolloServer(app) {
     const httpServer = http.createServer(app);
@@ -17,18 +18,28 @@ async function startApolloServer(app) {
             ApolloServerPluginDrainHttpServer({ httpServer }),
             ApolloServerPluginLandingPageGraphQLPlayground(),
         ],
-        context: ({ req }) => {
+        context: async ({ req }) => {
             const authorization = req.headers.authorization;
+            const accessToken = authorization
+                ? authorization.split(" ")[1]
+                : null;
             try {
+                if (!accessToken) throw new Error("Access token not found");
+                const blackListAccessToken = await redisClient.get(
+                    "BL_" + accessToken
+                );
+                if (blackListAccessToken)
+                    throw new Error("Access token is expired");
                 const decoded = jwt.verify(
-                    authorization ? authorization.split(" ")[1] : null,
-                    config.JWT_SECRET
+                    accessToken,
+                    config.JWT_ACCESS_SECRET
                 );
                 return {
                     isAuthenticated: true,
                     authenticatedErrorMsg: null,
                     userId: decoded.sub,
                     username: decoded.username,
+                    accessToken,
                 };
             } catch (e) {
                 return {
@@ -36,6 +47,7 @@ async function startApolloServer(app) {
                     authenticatedErrorMsg: e.toString(),
                     userId: null,
                     username: null,
+                    accessToken: null,
                 };
             }
         },
