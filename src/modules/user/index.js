@@ -1,12 +1,4 @@
 const { createModule, gql } = require("graphql-modules");
-const service = require("../../services");
-const CryptoJS = require("crypto-js");
-const config = require("../../config");
-const { Op } = require("sequelize");
-const { redisClient } = require("../../config/redis");
-const jwt = require("jsonwebtoken");
-const { AuthenticationError } = require("apollo-server-errors");
-const Helpers = require("../../helpers");
 const controller = require("../../controller");
 
 const userModule = createModule({
@@ -32,6 +24,11 @@ const userModule = createModule({
                     name: String
                     avatar: String
                 ): Response
+
+                changePassword(
+                    oldPassword: String
+                    newPassword: String
+                ): Response
             }
         `,
     ],
@@ -41,6 +38,7 @@ const userModule = createModule({
         },
         Mutation: {
             updateInformationUser: controller.user.updateInformationUser,
+            changePassword: controller.user.changePassword,
         },
     },
 });

@@ -1,4 +1,6 @@
+const config = require("../config");
 const User = require("../models/user.model");
+const CryptoJS = require("crypto-js");
 
 /**
  * @param {Object} data thong tin user
@@ -27,8 +29,27 @@ const update = async (params) => {
     return await User.update(updateInfo, { where: { id: params.userId } });
 };
 
+/**
+ * @param {Object} params
+ * @param {string} params.userId
+ * @param {string} params.newPassword
+ */
+const updatePassword = async (params) => {
+    const newEncryptedPassword = CryptoJS.HmacSHA256(
+        params.newPassword,
+        config.PRIVATE_KEY
+    ).toString();
+    return await User.update(
+        {
+            password: newEncryptedPassword,
+        },
+        { where: { id: params.userId } }
+    );
+};
+
 module.exports = {
     update,
+    updatePassword,
     findOne: async (...params) => {
         const user = await User.findOne(...params);
         return user;

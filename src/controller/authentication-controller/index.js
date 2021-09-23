@@ -40,15 +40,13 @@ const login = async (parent, args, context, info) => {
         args.password,
         config.PRIVATE_KEY
     ).toString();
-    const isSuccess = trueEncryptedPassword === encryptedPassword;
-    let accessToken = null;
-    if (isSuccess) {
+    if (trueEncryptedPassword === encryptedPassword) {
         // Generate token
-        accessToken = Helpers.generateAccessToken(
+        const accessToken = Helpers.generateAccessToken(
             userDataValue.id,
             userDataValue.username
         );
-        refreshToken = jwt.sign(
+        const refreshToken = jwt.sign(
             {
                 sub: userDataValue.id,
                 username: userDataValue.username,
@@ -60,16 +58,20 @@ const login = async (parent, args, context, info) => {
         );
 
         redisClient.set(refreshToken, userDataValue.id);
+        return {
+            message: "Success",
+            data: JSON.stringify({
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            }),
+            success: true,
+        };
     }
 
     return {
-        data: isSuccess
-            ? JSON.stringify({
-                  accessToken: accessToken,
-                  refreshToken: refreshToken,
-              })
-            : null,
-        success: isSuccess,
+        message: "Wrong password",
+        data: null,
+        success: false,
     };
 };
 
