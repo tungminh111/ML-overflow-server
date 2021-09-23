@@ -23,6 +23,7 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+            field: "username"
         },
         password: {
             type: DataTypes.STRING,
@@ -31,6 +32,12 @@ const User = sequelize.define(
         avatar: {
             type: DataTypes.STRING,
         },
+    }, {
+        indexes: [
+            {
+                fields: ["username"]
+            }
+        ]
     }
 );
 

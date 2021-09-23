@@ -38,9 +38,9 @@ services:
     volumes:
       - type: bind
         source: ./
-        target: /app
+        target: /usr/src/app
 
-      - /app/node_modules
+      - /usr/src/app/node_modules
       
     depends_on:
       postgres: 

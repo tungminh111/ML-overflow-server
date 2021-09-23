@@ -5,6 +5,7 @@ const User = require("../models/user.model");
  * @param {string} data.firstName ten dau tien cua no
  */
 const create = async (data) => {
+    console.log("CREATE DATA", JSON.stringify(data));
     const newUser = User.build(data);
     return await newUser.save();
 };
