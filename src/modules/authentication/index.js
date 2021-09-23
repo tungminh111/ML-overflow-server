@@ -54,6 +54,13 @@ const authenticationModule = createModule({
                         },
                     },
                 });
+                if (!user) {
+                    return {
+                        message: "User not found",
+                        data: null,
+                        success: false,
+                    };
+                }
                 const userDataValue = user.toJSON();
                 const trueEncryptedPassword = userDataValue.password;
                 const encryptedPassword = CryptoJS.HmacSHA256(

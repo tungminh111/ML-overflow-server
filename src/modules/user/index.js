@@ -24,6 +24,14 @@ const userModule = createModule({
             extend type Query {
                 users: [User]
             }
+
+            extend type Mutation {
+                updateInformationUser(
+                    userId: String!
+                    name: String
+                    avatar: String
+                ): Response
+            }
         `,
     ],
     resolvers: {
@@ -34,6 +42,24 @@ const userModule = createModule({
                 if (!isAuthenticated)
                     throw new AuthenticationError(authenticatedErrorMsg);
                 return service.User.findAll();
+            },
+        },
+        Mutation: {
+            updateInformationUser: async (parent, args, context, info) => {
+                const { isAuthenticated, userId, authenticatedErrorMsg } =
+                    context;
+                if (!isAuthenticated || userId !== args.userId)
+                    throw new AuthenticationError(authenticatedErrorMsg);
+
+                const result = await service.User.update({
+                    userId,
+                    name: args.name,
+                    avatar: args.avatar,
+                });
+                return {
+                    message: "Success",
+                    success: true,
+                };
             },
         },
     },
