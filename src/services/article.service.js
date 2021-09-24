@@ -16,4 +16,10 @@ module.exports = {
         return articles;
     },
     create,
+    destroy: async (...params) => {
+        Article.destroy(...params);
+    },
+    update: async (...params) => {
+        Article.update(...params);
+    },
 };
