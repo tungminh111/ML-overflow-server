@@ -10,9 +10,9 @@ module.exports = {
     Article: articleService,
     Following: followingService,
     Tag: tagService,
-    TagArticle: tagArticleService
+    TagArticle: tagArticleService,
+    Favorite: favoriteService,
 };
-
 
 const InitData = [
     {

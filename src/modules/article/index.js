@@ -11,6 +11,7 @@ const articleModule = createModule({
     typeDefs: [
         gql`
             type Article {
+                id: String!
                 title: String!
                 content: String!
                 authorId: String!

@@ -11,7 +11,7 @@ const Favorite = sequelize.define(
             allowNull: false,
             primaryKey: true,
         },
-        authorId: {
+        articleId: {
             type: DataTypes.UUID,
             allowNull: false,
             primaryKey: true,
