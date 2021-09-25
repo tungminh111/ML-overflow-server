@@ -1,6 +1,16 @@
 const articleService = require("./article.service");
 const followingService = require("./following.service");
 const userService = require("./user.service");
+const tagService = require("./tag.service");
+const tagArticleService = require("./tag_article.service");
+
+module.exports = {
+    User: userService,
+    Article: articleService,
+    Following: followingService,
+    Tag: tagService,
+    TagArticle: tagArticleService
+};
 
 
 const InitData = [
@@ -13,8 +23,3 @@ const InitData = [
 InitData.forEach(data => userService.create(data));
 
 
-module.exports = {
-    User: userService,
-    Article: articleService,
-    Following: followingService,
-};

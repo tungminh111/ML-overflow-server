@@ -3,6 +3,7 @@ const { userModule } = require("./user");
 const { articleModule } = require("./article");
 const { authenticationModule } = require("./authentication");
 const { followingModule } = require("./following");
+const { tagModule } = require("./tag");
 
 module.exports = {
     commonModule,
@@ -10,4 +11,5 @@ module.exports = {
     articleModule,
     authenticationModule,
     followingModule,
+    tagModule
 };
