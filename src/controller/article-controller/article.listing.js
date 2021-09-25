@@ -1,12 +1,13 @@
+const Article = require("../../models/article.model");
 const service = require("../../services");
 const articleService = service.Article;
 const userService = service.User;
 
 let articleListing = {
-    getListArticles: function (articleQuantity) {
-        return articleService.findAll({
+    getListArticles: async function (articleQuantity) {
+        return await articleService.findAll({
             limit: articleQuantity
-        })
+        });
     },
 
     createArticle: async function(data) {
@@ -20,6 +21,34 @@ let articleListing = {
         data.authorId = data.authorId.id;
         console.log("minh", JSON.stringify(data.authorId));
         articleService.create(data);
+    },
+
+    getArticleBySlug: async function(slug) {
+        const result = await articleService.findOne({
+            where: {
+                slug: slug
+            }
+        });
+        return result;
+    },
+
+    deleteArticleBySlug: async function(slug) {
+        articleService.destroy({
+            where: {
+                slug: slug
+            }
+        });
+    },
+
+    updateArticleBySlug: async function(slug, data) {
+        articleService.update(
+            data,
+            {
+                where: {
+                    slug: slug
+                }
+            }
+        )
     }
 }
 

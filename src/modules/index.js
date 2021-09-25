@@ -4,6 +4,7 @@ const { articleModule } = require("./article");
 const { authenticationModule } = require("./authentication");
 const { followingModule } = require("./following");
 const { favoriteModule } = require("./favorite");
+const { tagModule } = require("./tag");
 
 module.exports = {
     commonModule,
@@ -12,4 +13,5 @@ module.exports = {
     authenticationModule,
     followingModule,
     favoriteModule,
+    tagModule
 };

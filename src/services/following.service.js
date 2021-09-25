@@ -1,19 +1,6 @@
 const Following = require("../models/following.model");
+const BaseService = require("./base.service");
 
-/**
- * @param {Object} data thong tin user
- * @param {string} data.userId
- * @param {string} data.authorId
- */
-const create = async (data) => {
-    const newFollowing = Following.build(data);
-    return await newFollowing.save();
-};
+const followingService = new BaseService("followingService", Following);
 
-module.exports = {
-    findAll: async (...params) => {
-        const followings = await Following.findAll(...params);
-        return followings;
-    },
-    create,
-};
+module.exports = followingService;
